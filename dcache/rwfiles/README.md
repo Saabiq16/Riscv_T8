@@ -9,6 +9,10 @@ These two new policies were integrated into the replacement update logic without
 ✅ The updates are minimal and localized — only the relevant replacement policy if-else sections have been edited.
 
 📸 Screenshots below highlight the modified code regions, showing exactly where and how the new logic was inserted.
-![dcache1rw modified part](<dcache1rw.png>)
-![dcache2rw modified part](<dcache2rw.png>)
+
+dcache1rw modifed part
+![dcache1rw modified part](<ss/dcache1rw.png>)
+
+dcache2rw modifed part
+![dcache2rw modified part](<ss/dcache2rw.png>)
 git
