@@ -10,5 +10,5 @@ These two new policies were integrated into the replacement update logic without
 
 📸 Screenshots below highlight the modified code regions, showing exactly where and how the new logic was inserted.
 ![dcache1rw modified part](<dcache1rw.png>)
-![dcache2rw modified part](<dcache2rw>)
+![dcache2rw modified part](<dcache2rw.png>)
 git
