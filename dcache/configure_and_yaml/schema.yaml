@@ -1,0 +1,872 @@
+###
+#num_harts
+#^^^^^^^^^
+#
+# **Description**: Total number of harts to be instantiated in the dummy
+# test-soc. Note that these will non-coherent cores simply acting as masters on
+# the fast-bus.
+#
+#  **Examples**:
+#
+#  .. code-block:: yaml
+#
+#     num_harts: 2
+
+num_harts: {type: integer, default: 1, min: 1, max: 1024}
+
+###
+#
+#isb_sizes
+#^^^^^^^^^
+#
+# **Description**: A dictionary controlling the size of the inter-stage buffers
+# of the pipeline. The variable isb_s0s1 controls the size of the isb between stage0 and stage1. 
+# Similarly isb_s1s2 dictates the size of the isb between stage1 and stage2 and
+# so on. By increasing isb_s0s1 and isb_s1s2 one can shadow the stalls or
+# latencies in the backend stages of the pipeline by fetching more instructions
+# into the front-end stages of the pipeline.
+#
+# There is a restriction however that isb_s2s3 should always be 1. This is
+# because the outputs of register file accessed in stage2 are not buffered and
+# niether is the bypass scheme implemented to handle this scenario.
+#
+# One can however increase the number of in-flight instructions by increasing
+# the sizes of isb_s3s4 and isb_s4s5 (increasing isb_s3s4 has a larger impact).
+#
+# Also note that if write-after-write stalls are disabled , the size of the
+# wawid is defined by the sum of isb_s3s4 and isb_s4s5. Therefore, increasing
+# in-flight instructions caused a logarithmic increase in the wawid used for
+# maintaining bypass of operands.
+#
+#
+# **Examples**:
+#
+# .. code-block:: yaml
+#
+#   isb_sizes :
+#     isb_s0s1: 2
+#     isb_s1s2: 2
+#     isb_s2s3: 1
+#     isb_s3s4: 2
+#     isb_s4s5: 2
+
+isb_sizes:
+  type: dict
+  schema:
+    isb_s0s1:
+      type: integer
+      default: 2
+    isb_s1s2:
+      type: integer
+      default: 2
+    isb_s2s3:
+      type: integer
+      default: 1
+      allowed: [1]
+    isb_s3s4:
+      type: integer
+      default: 2
+    isb_s4s5:
+      type: integer
+      default: 2
+  default:
+    isb_s0s1: 2
+    isb_s1s2: 2
+    isb_s2s3: 1
+    isb_s3s4: 2
+    isb_s4s5: 2
+
+###
+#
+#merged_rf
+#^^^^^^^^^
+#
+# **Description**: Boolean field to indicate if the architectural registerfiles for floating
+# and integer should be implemented as a single extended regfile in hw or as
+# separate. This field only makes sense 'F' support is enabled in the ISA string
+# of the input isa yaml. Under certain targets like FPGA or certain technologies
+# maintaining a single registerfile might lead to better area and timing savings.
+#
+# **Examples**:
+#
+# .. code-block:: yaml
+#
+#   merged_rf: True
+
+merged_rf: {type: boolean, default: True}
+
+###
+#
+#total_events
+#^^^^^^^^^^^^
+#
+# **Description**: This field indicates the total number of events that can be used to program the mhpm
+# counters. This field is used to capture the size of the events signals that
+# drives the counters.
+#
+# **Examples**:
+#
+# .. code-block:: yaml
+#
+#   total_events: 28
+
+total_events: {type: integer, default: 0}
+
+###
+#
+#waw_stalls
+#^^^^^^^^^^
+#
+# **Description**: Indicates if stalls must occur on a WAW hazard. If you are
+# looking for higher performance set this to False. Setting this to true would
+# lead to instructions stalling in stage3 due to a WAW hazard. 
+#
+# Setting this to false also means the scoreboad will not allocate a unique id
+# to the destination register of every instruction that is offloaded for
+# execution. The size of this id depends on the numbr of in-flight instructions
+# after the execution stage, which in turn depends on the size of the isb_s3s4
+# and isb_s4s5 as defined above.
+#
+# **Examples**:
+#
+# .. code-block:: yaml
+#   
+#   waw_stalls: False
+
+waw_stalls: {type: boolean, default: False}
+
+###
+#
+#hardfloat
+#^^^^^^^^^^
+#
+# **Description**: Indicates if Berkeley hardfloat modules are to be used, or to
+# use float modules written in bluespec fully.
+#
+# **Examples**:
+#
+# .. code-block:: yaml
+#
+#   hardfloat: False
+hardfloat: {type: boolean, default: False}
+
+###
+#
+#fpu_clockgate
+#^^^^^^^^^^
+#
+# **Description**: Indicates if clockgate is enabled for the fpu.
+#
+# **Examples**:
+#
+# .. code-block:: yaml
+#
+#   fpu_clockgate: False
+fpu_clockgate: {type: boolean, default: False}
+
+###
+#
+#iepoch_size
+#^^^^^^^^^^^
+#
+# **Description**: integer value indicating the size of the epochs for the
+# instruction memory subsystem. Allowed value is 2 only
+#
+# **Examples**:
+#
+# .. code-block:: yaml
+#
+#   iepoch_size: 2
+
+iepoch_size:
+  type: integer
+  allowed: [2]
+  default: 2
+###
+#
+#depoch_size
+#^^^^^^^^^^^
+#
+# **Description**: integer value indicating the size of the epochs for the
+# data memory subsystem. Allowed value is 1 only
+#
+# **Examples**:
+#
+# .. code-block:: yaml
+#
+#   depoch_size: 1
+
+depoch_size:
+  type: integer
+  allowed: [1]
+  default: 1
+
+###
+#
+#s_extension
+#^^^^^^^^^^^
+#
+#  **Description**: Describes various supervisor and MMU related parameters.
+#  These parameters only take effect when "S" is present in the ISA field.
+#
+#    - ``itlb_size``: integer indicating the size of entries in the fully-associative Instruction TLB
+#    - ``dtlb_size``: integer indicating the size of entries in the fully-associative Data TLB
+#
+#  **Examples**:
+#
+#  .. code-block:: yaml
+#
+#    s_extension:
+#      itlb_size: 4
+#      dtlb_size: 4
+
+s_extension:
+  type: dict
+  schema:
+    itlb_size:
+      type: integer
+    dtlb_size:
+      type: integer
+  default:
+    itlb_size: 4
+    dtlb_size: 4
+
+###
+#
+#a_extension
+#^^^^^^^^^^^
+#
+#  **Description**: Describes various A-extension related parameters. These params take effect only
+#  when the "A" extension is enabled in the riscv_config ISA
+#
+#     - ``reservation_size``: integer indicate the size of the reservation in terms of bytes.
+#       Minimum value is 4 and must be a power of 2. For RV64 system minimum should be 8 bytes.
+#
+#  **Examples**:
+#
+#  .. code-block:: yaml
+#
+#     a_extension:
+#       reservation_size: 8
+
+a_extension:
+  type: dict
+  schema:
+    reservation_size: 
+      type: integer
+      min: 4
+  default:
+    reservation_size: 8
+
+
+###
+#
+#m_extension
+#^^^^^^^^^^^
+#
+#  **Description**: Describes various M-extension related parameters. These
+#  parameters take effect only is "M" is present in the ISA field.
+#  The multiplier used in the core is a retimed one. The parameters below indicate the number of
+#  input and output registers around the combo block to enable retiming.
+#
+#    - ``mul_stages_out``: Number of stages to be inserted after the multiplier combinational block.
+#      Minimum value is 1.
+#    - ``mul_stages_in``: Number of stages to be inserted before the multiplier combinational block.
+#      Minimum value is 0
+#    - ``div_stages``: an integer indicating the number of cycles for a single
+#      division operation. Max value is limited to the XLEN defined in the ISA.
+#
+#  **Examples**:
+#
+#  .. code-block:: yaml
+#
+#    m_extension:
+#      mul_stages_in  : 2
+#      mul_stages_out : 2
+#      div_stages: 32
+#
+
+m_extension:
+  type: dict
+  schema:
+    mul_stages_out:
+      type: integer
+      min: 1
+    mul_stages_in:
+      type: integer
+    div_stages:
+      type: integer
+  default:
+    mul_stages: 2
+    div_stages: 32
+
+###
+#
+#branch_predictor
+#^^^^^^^^^^^^^^^^
+#
+#  **Description**: Describes various branch predictor related parameters. 
+#
+#    - ``instantiate``: boolean value indicating if the predictor needs to be
+#      instantiated
+#    - ``predictor``: string indicating the type of predictor to be implemented. Valid
+#      values are: 'gshare' not. Valid values are : ['enable','disable']
+#    - ``btb_depth``: integer indicating the size of the branch target buffer
+#    - ``bht_depth``: integer indicating the size of the bracnh history buffer
+#    - ``history_len``: integer indicating the size of the global history register
+#    - ``history_bits``: integer indicating the number of bits used for indexing bht/btb.
+#    - ``ras_depth``: integer indicating the size of the return address stack.
+#
+#  **Examples**:
+#
+#  .. code-block:: yaml
+#
+#    branch_predictor:
+#      instantiate: True
+#      predictor: gshare
+#      btb_depth: 32
+#      bht_depth: 512
+#      history_len: 8
+#      history_bits: 5
+#      ras_depth: 8
+
+branch_predictor:
+  type: dict
+  schema:
+    instantiate:
+      type: boolean
+    predictor: 
+      type: string
+      allowed: ["gshare"]
+    btb_depth:
+      type: integer
+    bht_depth:
+      type: integer
+    history_len:
+      type: integer
+    history_bits:
+      type: integer
+      min: 1
+    ras_depth:
+      type: integer
+  default:
+    instantiate: True
+    predictor: gshare
+    btb_depth: 32
+    bht_depth: 512
+    history_len: 8
+    history_bits: 5
+    ras_depth: 8
+
+###
+#
+#icache_configuration
+#^^^^^^^^^^^^^^^^^^^^
+#
+#  **Description**: Describes the various instruction cache related features.
+#
+#    - ``instantiate``: boolean value indicating if the predictor needs to be
+#      instantiated
+#      not. Valid values are : ['enable','disable']
+#    - ``sets``: integer indicating the number of sets in the cache
+#    - ``word_size``: integer indicating the number of bytes in a word. Fixed to 4.
+#    - ``block_size``: integer indicating the number of words in a cache-block.
+#    - ``ways``: integer indicating the number of the ways in the cache
+#    - ``fb_size``: integer indicating the number of fill-buffer entries in the cache
+#    - ``replacement``: strings indicating the replacement policy. Valid values are:
+#      ["PLRU", "RR", "Random"]
+#    - ``ecc_enable``: boolean field indicating if ECC should be enabled on the
+#      cache.
+#    - ``one_hot_select``: boolean value indicating if the bsv one-hot selection
+#      funcion should be used of conventional for-loops to choose amongst
+#      lines/fb-lines. Choice of this has no affect on the functionality
+#
+#  If supervisor is enabled then the max size of a single way should not exceed
+#  4Kilo Bytes
+#
+#  **Examples**:
+#
+#  .. code-block:: yaml
+#
+#    icache_configuration:
+#      instantiate: True
+#      sets: 4
+#      word_size: 4
+#      block_size: 16
+#      ways: 4
+#      fb_size: 4
+#      replacement: "PLRU"
+#      ecc_enable: false
+#      one_hot_select: false
+
+
+icache_configuration:
+  type: dict
+  schema:
+    instantiate:
+      type: boolean
+    sets:
+      type: integer
+    word_size:
+      type: integer
+    block_size:
+      type: integer
+    ways:
+      type: integer
+    fb_size:
+      type: integer
+    replacement:
+      type: string
+      allowed: ["PLRU", "RR", "RANDOM"]
+    ecc_enable:
+      type: boolean
+    one_hot_select:
+      type: boolean
+  default:
+    instantiate: True
+    sets: 4
+    word_size: 4
+    block_size: 16
+    ways: 4
+    fb_size: 4
+    replacement: "PLRU"
+    ecc_enable: false
+    one_hot_select: false
+
+
+###
+#
+#dcache_configuration
+#^^^^^^^^^^^^^^^^^^^^
+#
+#  **Description**: Describes the various instruction cache related features.
+#
+#    - ``instantiate``: boolean value indicating if the predictor needs to be
+#      instantiated
+#      not. Valid values are : ['enable','disable']
+#    - ``sets``: integer indicating the number of sets in the cache
+#    - ``word_size``: integer indicating the number of bytes in a word. Fixed to 4.
+#    - ``block_size``: integer indicating the number of words in a cache-block.
+#    - ``ways``: integer indicating the number of the ways in the cache
+#    - ``fb_size``: integer indicating the number of fill-buffer entries in the cache
+#    - ``sb_size``: integer indicating the number of store-buffer entries in the cache. Fixed to 2
+#    - ``lb_size``: integer indicating the number lines to be stored in the store buffer. Applicable
+#      only when rwports == 1r1w
+#    - ``ib_Size``: integer indicating the number of io-buffer entries in the cache. Default to 2
+#    - ``replacement``: strings indicating the replacement policy. Valid values are:
+#      ["PLRU", "RR", "Random"]
+#    - ``ecc_enable``: boolean field indicating if ECC should be enabled on the
+#      cache.
+#    - ``one_hot_select``: boolean value indicating if the bsv one-hot selection
+#      funcion should be used of conventional for-loops to choose amongst
+#      lines/fb-lines. Choice of this has no affect on the functionality
+#    - ``rwports``: number of read-write ports available on the brams. Allowed
+#      values are 1rw, 1r1w and 2rw
+#
+#  If supervisor is enabled then the max size of a single way should not exceed
+#  4Kilo Bytes
+#
+#  **Examples**:
+#
+#  .. code-block:: yaml
+#
+#    dcache_configuration:
+#      instantiate: True
+#      sets: 4
+#      word_size: 4
+#      block_size: 16
+#      ways: 4
+#      fb_size: 4
+#      sb_size: 2
+#      lb_size: 2
+#      ib_size: 2
+#      replacement: "PLRU"
+#      ecc_enable: false
+#      one_hot_select: false
+#      rwports: 1r1w
+
+dcache_configuration:
+  type: dict
+  schema:
+    instantiate:
+      type: boolean
+    sets:
+      type: integer
+    word_size:
+      type: integer
+    block_size:
+      type: integer
+    ways:
+      type: integer
+    fb_size:
+      type: integer
+    sb_size:
+      type: integer
+      allowed: [2]
+    lb_size:
+      type: integer
+    ib_size:
+      type: integer
+    replacement:
+      type: string
+      allowed: ["PLRU", "RR", "RANDOM","FIFO","LFU"]
+    ecc_enable:
+      type: boolean
+    one_hot_select:
+      type: boolean
+    rwports:
+      type: string 
+      allowed: ['1rw', '1r1w', '2rw']
+  default:
+    instantiate: True
+    sets: 4
+    word_size: 8
+    block_size: 8
+    ways: 4
+    fb_size: 8
+    sb_size: 2
+    lb_size: 2
+    ib_size: 2
+    replacement: "PLRU"
+    tag_banks: 1
+    data_banks: 1
+    ecc_enable: false
+    one_hot_select: false
+    rwports: '1r1w'
+
+###
+#
+#reset_pc
+#^^^^^^^^
+#
+#  **Description**: Integer value indicating the reset value of program counter
+#
+#  **Example**:
+#
+#  .. code-block: yaml
+#
+#    reset_pc: 4096
+
+reset_pc:
+  type: integer
+  default: 4096
+
+
+
+
+
+###
+#
+#bus_protocol
+#^^^^^^^^^^^^
+#
+#  **Description**: bus protocol for the master interfaces of the core. Fixed to
+#  "AXI4"
+#
+#  **Examples**: 
+#
+#  .. code-block:: yaml
+#
+#    bus_protocol: AXI4
+
+bus_protocol_configuration:
+  type: dict
+  schema:
+    bus_protocol:
+      type: string
+      allowed: ["AXI4"]
+    bus_width:
+      type: integer
+    axi4_transactor_fifo_depth:
+      type: integer
+    axi4_internal_fifo_depth:
+      type: integer
+    axi4_lite_transactor_fifo_depth:
+      type: integer
+    axi4_lite_internal_fifo_depth:
+      type: integer
+    axi4_id_width:
+      type: integer
+    userspace_width:
+      type: integer  
+  default:
+    bus_protocol: "AXI4"
+    bus_width: 64
+    axi4_transactor_fifo_depth: 2
+    axi4_internal_fifo_depth: 2
+    axi4_lite_transactor_fifo_depth: 2
+    axi4_lite_internal_fifo_depth: 2
+    axi4_id_width: 4
+    userspace_width: 0
+  
+
+###
+#fpu_trap
+#  **Description**: Boolean value indicating if the core should trap on floating
+#  point exception and integer divide-by-zero conditions.
+#
+#  **Examples**:
+#
+#  .. code-block:: yaml
+#
+#    fpu_trap: False
+
+fpu_trap:
+  type: boolean
+  default: False
+
+###
+#verilator_configuration
+#^^^^^^^^^^^^^^^^^^^^^^^
+#
+#  **Description**: describes the various configurations for verilator compilation.
+#
+#    - ``coverage``: indicates the type of coverage that the user would like to
+#      track. Valid values are: ["none", "line", "toggle", "all"]
+#    - ``trace``: boolean value indicating if vcd dumping should be enabled.
+#    - ``threads``: an integer field indicating the number of threads to be used
+#      during simulation
+#    - ``verbosity``: a boolean field indicating of the verbose/display statements in
+#      the generated verilog should be compiled or not.
+#    - ``out_dir``: name of the directory where the final executable will be dumped.
+#    - ``sim_speed``: indicates if the user would prefer a fast simulation or slow
+#      simulation. Valid values are : ["fast","slow"]. Please selecting "fast"
+#      will speed up simulation but slow down compilation, while selecting "slow"
+#      does the opposite.
+#
+#  **Examples**:
+#
+#  .. code-block:: yaml
+#
+#   verilator_configuration:
+#     coverage: "none"
+#     trace: False
+#     threads: 1
+#     verbosity: True
+#     open_ocd: False
+#     sim_speed: fast
+
+verilator_configuration:
+  type: dict
+  schema:
+    coverage:
+      type: string
+      allowed: ["none", "line", "toggle", "all"]
+      default: "none"
+    trace:
+      type: boolean
+    threads:
+      type: integer
+    verbosity:
+      type: boolean
+    out_dir:
+      type: string
+    opt_fast:
+      type: string
+      default: "-O3"
+    opt_slow:
+      type: string
+      default: "-O3"
+    opt:
+      type: string
+      default: "-O3"
+  default:
+    coverage: "none"
+    trace: False
+    threads: 1
+    verbosity: True
+    opt_fast: "-O3"
+    opt_slow: "-O3"
+    opt: "-O3"
+    out_dir: bin
+
+
+###
+#
+#bsc_compile_options
+#^^^^^^^^^^^^^^^^^^^
+#
+#  **Description**: Describes the various bluespec compile options
+#
+#    - ``test_memory_size``: size of the BRAM memory in the test-SoC in bytes.
+#       Default is 32MB
+#    - ``assertions``: boolean value indicating if assertions used in the design
+#      should be compiled or not
+#    - ``trace_dump``: boolean value indicating if the logic to generate a simple
+#      trace should be implemented or not. Note this is only for simulation and not
+#      a real trace
+#    - ``compile_target``: a string indicating if the bsv files are being compiled for simulation
+#      of for asic/fpga synthesis. The valid values are: [ 'sim', 'asic', 'fpga' ]
+#    - ``suppress_warnings``: List of warnings which can be suppressed during
+#      bluespec compilation. Valid values are: ["none", "all", "G0010", "T0054", "G0020", "G0024", "G0023", "G0096", "G0036", "G0117", "G0015"]
+#    - ``ovl_assertions``: boolean value indicating if OVL based assertions must be turned on/off
+#    - ``ovl_path``: string indicating the path where the OVL library is installed.
+#    - ``sva_assertions``: boolean value indicating if SVA based assertions must be turned on/off
+#    - ``verilog_dir``: the directory name of where the generated verilog will be
+#      dumped
+#    - ``open_ocd``: a boolean field indicating if the test-bench should have an
+#      open-ocd vpi enabled.
+#    - ``build_dir``: the directory name where the bsv build files will be dumped
+#    - ``top_module``: name of the top-level bluespec module to be compiled.
+#    - ``top_file``: file containing the top-level module.
+#    - ``top_dir``: directory containing the top_file.
+#   - ``cocotb_sim``: boolean variable. When set the terminating conditions in the test-bench
+#     environments are disabled, as the cocotb environment is meant to handle that. When set to
+#     false, the bluespect test-bench holds the terminating conditions.
+#
+#  **Examples**:
+#
+#  .. code-block:: yaml
+#
+#   bsc_compile_options:
+#     assertions: True
+#     trace_dump: True
+#     suppress_warnings: "none"
+#     top_module: mkTbSoc
+#     top_file: TbSoc
+#     top_dir: base_sim
+#     out_dir: bin
+
+bsc_compile_options:
+  type: dict
+  schema:
+    test_memory_size:
+      type: integer
+      default: 33554432
+    assertions:
+      type: boolean
+    trace_dump:
+      type: boolean
+    etrace_port:
+      type: boolean   
+    compile_target:
+      type: string
+      allowed: ['sim', 'asic', 'fpga']
+      default: 'sim'
+    suppress_warnings:
+      type: list
+      schema:
+        type: string
+        allowed: ["none", "all", "G0010","T0054","G0020","G0024","G0023","G0096","G0036","G0117","G0015"]
+    ovl_assertions:
+      type: boolean
+    ovl_path:
+      type: string
+    sva_assertions:
+      type: boolean
+    verilog_dir:
+      type: string
+    open_ocd:
+      type: boolean
+    build_dir:
+      type: string
+    top_module:
+      type: string
+    top_file:
+      type: string
+    top_dir:
+      type: string
+    cocotb_sim:
+      type: boolean
+    static_check:
+      type: boolean
+      default: False
+    verbosity:
+      type: integer
+      default: 2
+  default:
+    test_memory_size: 33554432
+    assertions: True
+    trace_dump: True
+    etrace_port: False
+    ovl_assertions: False
+    ovl_path: ''
+    sva_assertions: False
+    suppress_warnings: "none"
+    top_module: mkTbSoc
+    top_file: TbSoc
+    top_dir: base_sim
+    open_ocd: False
+    compile_target: 'sim'
+    cocotb_sim: False
+    static_check: False
+    verbosity: 2
+
+###
+#
+#noinline_modules
+#^^^^^^^^^^^^^^^^
+#
+# **Description**: This node contains multiple module names which take a boolean value. Setting a
+# module to True would generate a separate verilog file for that module during bluespec compilation.
+# If set to False, then that particular module will be in lined the module  above it in hierarchy in
+# the generated verilog.
+#
+# **Examples**:
+#
+# .. code-block:: yaml
+#
+#   noinline_modules:
+#     stage0: False
+#     stage1: True
+#     stage2: False
+#     stage3: False
+
+noinline_modules:
+  type: dict
+  schema:
+    stage0: 
+      type: boolean
+    stage1:
+      type: boolean
+    stage2:
+      type: boolean
+    stage3:
+      type: boolean
+    stage4:
+      type: boolean
+    stage5:
+      type: boolean
+    mbox:
+      type: boolean
+    mbox_mul:
+      type: boolean
+    mbox_div:
+      type: boolean
+    registerfile:
+      type: boolean
+    bpu:
+      type: boolean
+    riscv:
+      type: boolean
+    csrbox:
+      type: boolean
+    scoreboard:
+      type: boolean
+    bypass:
+      type: boolean
+    base_alu:
+      type: boolean
+    decoder:
+      type: boolean
+    decompress: 
+      type: boolean
+  default:
+    stage0: False
+    stage1: False
+    stage2: False
+    stage3: False
+    stage4: False
+    stage5: False
+    mbox: False
+    mbox_mul: False
+    mbox_div: False
+    registerfile: False
+    bpu: False
+    riscv: False
+    csrbox: False
+    scoreboard: False
+    bypass: False
+    base_alu: False
+    decoder: False
+    decompress: False
