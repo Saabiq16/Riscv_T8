@@ -30,7 +30,7 @@ icache_configuration:
   word_size: 4
   block_size: 16
   ways: 4
-  replacement: PLRU
+  replacement: LFU
   fb_size: 4
   ecc_enable: false
   one_hot_select: false

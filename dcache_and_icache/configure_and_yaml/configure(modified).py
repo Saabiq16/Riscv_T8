@@ -324,6 +324,10 @@ def capture_compile_cmd(foo, isa_node, debug_spec, grouping_spec):
         macros += ' irepl=1'
     if foo['icache_configuration']['replacement'] == "PLRU":
         macros += ' irepl=2'
+    if foo['icache_configuration']['replacement'] == "FIFO":
+        macros += ' irepl=3'
+    if foo['icache_configuration']['replacement'] == "LFU":
+        macros += ' irepl=4'
     
     macros += ' dwords='+str(foo['dcache_configuration']['word_size'])
     macros += ' dblocks='+str(foo['dcache_configuration']['block_size'])

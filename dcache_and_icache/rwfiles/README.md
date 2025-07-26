@@ -1,4 +1,4 @@
-This folder contains modified versions of the original Shakti dcache1rw.bsv and dcache2rw.bsv files.
+This folder contains modified versions of the original Shakti dcache1rw.bsv , dcache2rw.bsv  and icache.bsv files
 The changes are focused on enabling support for two new cache replacement policies:
 
       drepl == 3 → FIFO (First-In-First-Out)
@@ -15,4 +15,10 @@ dcache1rw modifed part
 
 dcache2rw modifed part
 ![dcache2rw modified part](<ss/dcache2rw.png>)
-git
+
+icache modified part
+![alt text](ss/image.png)
+
+
+
+

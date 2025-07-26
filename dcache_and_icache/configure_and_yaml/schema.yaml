@@ -417,7 +417,7 @@ icache_configuration:
       type: integer
     replacement:
       type: string
-      allowed: ["PLRU", "RR", "RANDOM"]
+      allowed: ["PLRU", "RR", "RANDOM","FIFO","LFU"]
     ecc_enable:
       type: boolean
     one_hot_select:
