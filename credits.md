@@ -34,7 +34,7 @@ Their continuous technical guidance, patience, and invaluable insights were esse
 ### 👥 Contributors
 
 - **Saabiq U A** – *2023105514*  
-- **Thiruvikesh** – *2023105502*  
+- **Thiruvikesh B** – *2023105502*  
 
 > **ECE, 3rd Year**  
 > College of Engineering, Guindy  
