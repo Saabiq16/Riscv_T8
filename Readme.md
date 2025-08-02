@@ -84,3 +84,6 @@ This project was made possible by the support and guidance from:
 - **Vyoma Systems**
 - **Shakti Processor Team, IIT Madras**
 
+---
+
+👉 For detailed acknowledgements and contributor information, [click here to view the full credits](./credits.md).
