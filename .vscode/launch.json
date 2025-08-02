@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "e:/GIT/RIsc/dcache_and_icache/replacement",
-      "program": "e:/GIT/RIsc/dcache_and_icache/replacement/build/Debug/outDebug",
+      "cwd": "e:/GIT/RIsc/coremarks",
+      "program": "e:/GIT/RIsc/coremarks/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
