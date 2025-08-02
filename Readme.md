@@ -59,8 +59,8 @@ These policies were designed and tested within the **Bluespec SystemVerilog**-ba
 
 ## References
 
-- [Shakti Processor Documentation](https://shakti.org.in/docs/)
-- [RISC-V ISA Specifications](https://riscv.org/technical/specifications/)
+- [Shakti Processor Documentation](https://shakti.org.in)
+- [RISC-V ISA Specifications](https://riscv.org/specifications/ratified//)
 - [Cache Replacement Policy – Wikipedia](https://en.wikipedia.org/wiki/Cache_replacement_policies)
 
 ---
